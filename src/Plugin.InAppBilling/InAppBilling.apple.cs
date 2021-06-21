@@ -55,6 +55,7 @@ namespace Plugin.InAppBilling
 				Name = p.LocalizedTitle,
 				ProductId = p.ProductIdentifier,
 				Description = p.LocalizedDescription,
+				SubscriptionPeriod = p.SubscriptionPeriod.ToIso8601Format() ?? string.Empty,
 				CurrencyCode = p.PriceLocale?.CurrencyCode ?? string.Empty,
 				LocalizedIntroductoryPrice = IsiOS112 ? (p.IntroductoryPrice?.LocalizedPrice() ?? string.Empty) : string.Empty,
 				MicrosIntroductoryPrice = IsiOS112 ? (long)((p.IntroductoryPrice?.Price?.DoubleValue ?? 0) * 1000000d) : 0
@@ -564,6 +565,20 @@ namespace Plugin.InAppBilling
 			var formattedString = formatter.StringFromNumber(product.Price);
 			Console.WriteLine(" ** formatter.StringFromNumber(" + product.Price + ") = " + formattedString + " for locale " + product.PriceLocale.LocaleIdentifier);
 			return formattedString;
+		}
+
+		public static string ToIso8601Format(this SKProductSubscriptionPeriod subscriptionPeriod)
+		{
+			var period = subscriptionPeriod.Unit switch
+			{
+				SKProductPeriodUnit.Year => "Y",
+				SKProductPeriodUnit.Month => "M",
+				SKProductPeriodUnit.Week => "W",
+				SKProductPeriodUnit.Day => "D",
+				_ => null
+			};
+
+			return period == null ? null : $"P{subscriptionPeriod.NumberOfUnits}{period}";
 		}
 	}
 }

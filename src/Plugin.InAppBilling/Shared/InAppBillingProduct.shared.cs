@@ -21,6 +21,11 @@ namespace Plugin.InAppBilling
         public string Description { get; set; }
 
         /// <summary>
+        /// Subscription period, specified in ISO 8601 format.
+        /// </summary>
+        public string SubscriptionPeriod { get; set; }
+
+        /// <summary>
         /// Trial period, specified in ISO 8601 format.
         /// </summary>
         public string FreeTrialPeriod { get; set; }

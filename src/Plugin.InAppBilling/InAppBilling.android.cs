@@ -160,6 +160,7 @@ namespace Plugin.InAppBilling
                 MicrosPrice = product.PriceAmountMicros,
                 LocalizedIntroductoryPrice = product.IntroductoryPrice,
                 MicrosIntroductoryPrice = product.IntroductoryPriceAmountMicros,
+                SubscriptionPeriod = product.SubscriptionPeriod,
                 FreeTrialPeriod = product.FreeTrialPeriod,
                 IconUrl = product.IconUrl,
                 IntroductoryPriceCycles = product.IntroductoryPriceCycles,
