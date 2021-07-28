@@ -48,17 +48,39 @@ namespace Plugin.InAppBilling
 		{
 			var products = await GetProductAsync(productIds);
 
-			return products.Select(p => new InAppBillingProduct
+			return products.Select(p =>
 			{
-				LocalizedPrice = p.LocalizedPrice(),
-				MicrosPrice = (long)(p.Price.DoubleValue * 1000000d),
-				Name = p.LocalizedTitle,
-				ProductId = p.ProductIdentifier,
-				Description = p.LocalizedDescription,
-				SubscriptionPeriod = p.SubscriptionPeriod.ToIso8601Format() ?? string.Empty,
-				CurrencyCode = p.PriceLocale?.CurrencyCode ?? string.Empty,
-				LocalizedIntroductoryPrice = IsiOS112 ? (p.IntroductoryPrice?.LocalizedPrice() ?? string.Empty) : string.Empty,
-				MicrosIntroductoryPrice = IsiOS112 ? (long)((p.IntroductoryPrice?.Price?.DoubleValue ?? 0) * 1000000d) : 0
+				var product = new InAppBillingProduct
+				{
+					LocalizedPrice = p.LocalizedPrice(),
+					MicrosPrice = (long) (p.Price.DoubleValue * 1000000d),
+					Name = p.LocalizedTitle,
+					ProductId = p.ProductIdentifier,
+					Description = p.LocalizedDescription,
+					SubscriptionPeriod = p.SubscriptionPeriod.ToIso8601Format() ?? string.Empty,
+					CurrencyCode = p.PriceLocale?.CurrencyCode ?? string.Empty,
+					LocalizedIntroductoryPrice =
+						IsiOS112 ? (p.IntroductoryPrice?.LocalizedPrice() ?? string.Empty) : string.Empty,
+					MicrosIntroductoryPrice = IsiOS112
+						? (long) ((p.IntroductoryPrice?.Price?.DoubleValue ?? 0) * 1000000d)
+						: 0,
+					IntroductoryPriceCycles = (int) (p.IntroductoryPrice?.NumberOfPeriods ?? 0),
+				};
+
+				switch (p.IntroductoryPrice?.PaymentMode)
+				{
+					case SKProductDiscountPaymentMode.PayAsYouGo:
+					case SKProductDiscountPaymentMode.PayUpFront:
+						product.IntroductoryPricePeriod =
+						    p.IntroductoryPrice?.SubscriptionPeriod.ToIso8601Format() ?? string.Empty;
+						break;
+					case SKProductDiscountPaymentMode.FreeTrial:
+						product.FreeTrialPeriod =
+						    p.IntroductoryPrice?.SubscriptionPeriod.ToIso8601Format() ?? string.Empty;
+						break;
+				}
+
+			    return product;
 			});
 		}
 
